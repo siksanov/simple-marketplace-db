@@ -1,0 +1,19 @@
+{
+  "name": "simple-marketplace-db",
+  "version": "0.0.1",
+  "private": true,
+  "description": "This projects is designed to teach",
+  "license": "ISC",
+  "author": "@Ilyaendlesss",
+  "type": "module",
+  "main": "db.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.1.0",
+    "express": "^4.19.2",
+    "swagger-ui-express": "^5.0.1"
+  }
+}

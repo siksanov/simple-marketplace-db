@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="800" viewBox="0 0 600 800" fill="none">
+  <rect width="600" height="800" fill="#f3f0f7"/>
+  <rect x="80" y="110" width="440" height="580" rx="24" fill="url(#grad)"/>
+  <path d="M190 500L260 430L330 510L390 450L460 530" stroke="white" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="240" cy="300" r="42" fill="white"/>
+  <text x="300" y="620" text-anchor="middle" fill="white" font-family="Arial, Helvetica, sans-serif" font-size="38" font-weight="700">Нет фото</text>
+  <defs>
+    <linearGradient id="grad" x1="80" y1="110" x2="520" y2="690" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#BE43FF"/>
+      <stop offset="1" stop-color="#7A2DF8"/>
+    </linearGradient>
+  </defs>
+</svg>

@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WB demo — Marketplace (API)</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar__inner">
+      <div class="brand" id="goHome" title="На главную">
+        <div class="brand__logo">WB</div>
+        <div class="brand__text">
+          <div class="brand__title">WB demo</div>
+          <div class="brand__subtitle">Каталог · фильтры · сорт · ❤️ · корзина</div>
+        </div>
+      </div>
+
+      <div class="topbar__actions">
+        <div class="search">
+          <input id="search" class="input input--search" placeholder="Найти на WB demo" />
+          <button id="btnSearch" class="btn btn--primary">Найти</button>
+        </div>
+
+        <button id="btnFavorites" class="btn btn--ghost">❤️ Избранное <span class="pill" id="favCount">0</span></button>
+        <button id="btnCart" class="btn btn--dark">Корзина <span class="pill pill--dark" id="cartCount">0</span></button>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="chipsRow">
+        <div class="chips" id="categories"></div>
+        <div class="chipsRight">
+          <a class="apiLink" href="/docs" target="_blank" rel="noreferrer">Swagger</a>
+          <a class="apiLink" href="/openapi.json" target="_blank" rel="noreferrer">OpenAPI</a>
+          <a class="apiLink" href="/api/meta" target="_blank" rel="noreferrer">API meta</a>
+          <a class="apiLink" href="/api/products" target="_blank" rel="noreferrer">/products</a>
+          <a class="apiLink" href="/api/cart" target="_blank" rel="noreferrer">/cart</a>
+        </div>
+      </div>
+
+      <section class="filtersBar">
+        <div class="filtersBar__left">
+          <div class="field">
+            <div class="field__label">Цена</div>
+            <div class="field__row">
+              <input id="minPrice" class="input input--sm" placeholder="от ₽" inputmode="numeric" />
+              <input id="maxPrice" class="input input--sm" placeholder="до ₽" inputmode="numeric" />
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field__label">Наличие</div>
+            <label class="toggle">
+              <input id="inStock" type="checkbox" />
+              <span>Только в наличии</span>
+            </label>
+          </div>
+
+          <div class="field">
+            <div class="field__label">Бренд</div>
+            <select id="brand" class="select">
+              <option value="">Все</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <div class="field__label">Сортировка</div>
+            <select id="sort" class="select">
+              <option value="popular">Популярное</option>
+              <option value="newest">Новинки</option>
+              <option value="rating">По рейтингу</option>
+              <option value="price_asc">Цена ↑</option>
+              <option value="price_desc">Цена ↓</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="filtersBar__right">
+          <button id="btnApply" class="btn btn--primary">Применить</button>
+          <button id="btnReset" class="btn btn--ghost">Сброс</button>
+        </div>
+      </section>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero__content">
+        <h1>Одежда, техника, дом и красота по выгодным ценам</h1>
+        <p>Демо-витрина в стиле маркетплейса: фильтры, избранное, варианты товара, корзина и оформление заказа.</p>
+      </div>
+      <div class="hero__badges">
+        <span>Быстрая доставка</span>
+        <span>Честные отзывы</span>
+        <span>Скидки каждый день</span>
+      </div>
+    </section>
+
+    <section class="metaRow">
+      <div class="muted" id="metaText">Загрузка каталога…</div>
+      <div class="muted" id="modeBadge"></div>
+    </section>
+
+    <section>
+      <div id="products" class="grid"></div>
+
+      <div class="pager">
+        <button id="btnMore" class="btn btn--primary btn--wide hidden">Показать ещё</button>
+      </div>
+    </section>
+
+    <section class="mt24">
+      <h2 class="h2">Заказы (демо)</h2>
+      <div id="orders" class="orders"></div>
+    </section>
+  </main>
+
+  <!-- Favorites drawer -->
+  <div id="favBackdrop" class="backdrop hidden"></div>
+  <aside id="favDrawer" class="drawer hidden" aria-hidden="true">
+    <div class="drawer__head">
+      <div>
+        <div class="drawer__title">❤️ Избранное</div>
+        <div class="muted" id="favSub"></div>
+      </div>
+      <button id="btnCloseFav" class="btn btn--ghost">Закрыть</button>
+    </div>
+
+    <div id="favItems" class="drawer__body"></div>
+
+    <div class="drawer__foot">
+      <div class="muted">Подсказка: избранное хранится в SQLite (таблица favorites)</div>
+    </div>
+  </aside>
+
+  <!-- Cart drawer -->
+  <div id="drawerBackdrop" class="backdrop hidden"></div>
+  <aside id="drawer" class="drawer hidden" aria-hidden="true">
+    <div class="drawer__head">
+      <div>
+        <div class="drawer__title">Корзина</div>
+        <div class="muted" id="cartUpdatedAt"></div>
+      </div>
+      <button id="btnCloseDrawer" class="btn btn--ghost">Закрыть</button>
+    </div>
+
+    <div id="cartItems" class="drawer__body"></div>
+
+    <div class="drawer__foot">
+      <div class="total">
+        <div class="muted">Итого</div>
+        <div class="total__value"><span id="cartTotal">0</span> ₽</div>
+      </div>
+
+      <div class="checkout">
+        <input id="custName" class="input" placeholder="Имя" />
+        <input id="custEmail" class="input" placeholder="Email" />
+        <button id="btnCheckout" class="btn btn--primary btn--block">Оформить заказ</button>
+        <div id="checkoutMsg" class="msg"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Product modal -->
+  <div id="modalBackdrop" class="backdrop hidden"></div>
+  <div id="modal" class="modal hidden" role="dialog" aria-hidden="true">
+    <div class="modal__head">
+      <div>
+        <div class="modal__title" id="mTitle">Товар</div>
+        <div class="muted" id="mSub"></div>
+      </div>
+      <button id="btnCloseModal" class="btn btn--ghost">Закрыть</button>
+    </div>
+    <div class="modal__body">
+      <div class="modal__img" id="mImg"></div>
+      <div class="modal__info">
+        <div class="modal__priceRow">
+          <div class="modal__price" id="mPrice"></div>
+          <div class="modal__stock" id="mStock"></div>
+        </div>
+        <div class="modal__variants" id="mVariants"></div>
+        <div class="modal__desc" id="mDesc"></div>
+        <div class="modal__meta" id="mMeta"></div>
+        <div class="modal__actions">
+          <button id="mFav" class="btn">❤️</button>
+          <button id="mAdd" class="btn btn--primary">В корзину</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
