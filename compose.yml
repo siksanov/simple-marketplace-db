@@ -1,5 +1,6 @@
 services:
-  bot:
+  wb:
+    image: 'simple-marketplace-db:latest'
     build:
       context: .
     restart: always
